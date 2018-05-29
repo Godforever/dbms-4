@@ -14,8 +14,7 @@ def linear_search(R_A=40, S_C=60):
         R_addr = int(''.join(BUFFER.data[blkPtr + 56:blkPtr + 60]), 16)
         bytesPtr = 0
         while bytesPtr < blkSize - 8:
-            A_bytes, B_bytes = BUFFER.data[blkPtr+bytesPtr:blkPtr+bytesPtr+4], BUFFER.data[blkPtr+bytesPtr+4:blkPtr+bytesPtr+8]
-            bytesPtr += 8
+            A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
             if BytesToInt(''.join(A_bytes)) == R_A:
                 print('('+str(BytesToInt(''.join(A_bytes)))+',' +str(BytesToInt(''.join(B_bytes)))+')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
@@ -28,15 +27,12 @@ def linear_search(R_A=40, S_C=60):
         S_addr = int(''.join(BUFFER.data[blkPtr + 56:blkPtr + 60]), 16)
         bytesPtr = 0
         while bytesPtr < blkSize - 8:
-            C_bytes, D_bytes = BUFFER.data[blkPtr + bytesPtr:blkPtr + bytesPtr + 4], BUFFER.data[
-                                                                                     blkPtr + bytesPtr + 4:blkPtr + bytesPtr + 8]
-            bytesPtr += 8
+            C_bytes, D_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
             if BytesToInt(''.join(C_bytes)) == S_C:
                 print('(' + str(BytesToInt(''.join(C_bytes))) + ',' + str(BytesToInt(''.join(D_bytes))) + ')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
                                                                    './result/linear_select', C_bytes+ D_bytes)
         BUFFER.freeBlockInBuffer(blkPtr)
-
 
     # 将result的剩余部分写入磁盘中
     if result_offset !=0:
@@ -67,8 +63,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                 blkPtr = high_Ptr
             bytesPtr = 0
             while bytesPtr < blkSize - 8:
-                A_bytes = BUFFER.data[blkPtr + bytesPtr:blkPtr + bytesPtr + 4]
-                B_bytes = BUFFER.data[blkPtr + bytesPtr + 4:blkPtr + bytesPtr + 8]
+                A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
                 bytesPtr += 8
                 if BytesToInt(A_bytes) == A_C:
                     print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')
@@ -98,8 +93,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                         blkPtr = BUFFER.readBlockFromDisk(addr=blk_addr)
                         bytesPtr = 0
                         while bytesPtr < blkSize - 8:
-                            A_bytes = BUFFER.data[blkPtr + bytesPtr:blkPtr + bytesPtr + 4]
-                            B_bytes = BUFFER.data[blkPtr + bytesPtr + 4:blkPtr + bytesPtr + 8]
+                            A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
                             bytesPtr += 8
                             if BytesToInt(A_bytes) < A_C:
                                 flag = False
@@ -120,8 +114,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                         blkPtr = BUFFER.readBlockFromDisk(addr=blk_addr)
                         bytesPtr = 0
                         while bytesPtr < blkSize - 8:
-                            A_bytes = BUFFER.data[blkPtr + bytesPtr:blkPtr + bytesPtr + 4]
-                            B_bytes = BUFFER.data[blkPtr + bytesPtr + 4:blkPtr + bytesPtr + 8]
+                            A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
                             bytesPtr += 8
                             if BytesToInt(A_bytes) < A_C:
                                 flag = False
@@ -137,8 +130,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
 
                 bytesPtr = 0
                 while bytesPtr < blkSize - 8:
-                    A_bytes = BUFFER.data[mid_Ptr + bytesPtr:mid_Ptr + bytesPtr + 4]
-                    B_bytes = BUFFER.data[mid_Ptr + bytesPtr + 4:mid_Ptr + bytesPtr + 8]
+                    A_bytes, B_bytes = getBytes_A_B(mid_Ptr, bytesPtr)
                     bytesPtr += 8
                     if BytesToInt(A_bytes) == A_C:
                         print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')

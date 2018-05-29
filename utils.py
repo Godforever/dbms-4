@@ -134,6 +134,13 @@ def add_result(resultPtr, result_offset,result_addr, path, X_bytes):
 
     return resultPtr, result_offset, result_addr
 
+def getBytes_A_B(blkPtr, bytesPtr):
+    A_bytes = BUFFER.data[blkPtr + bytesPtr:blkPtr + bytesPtr + 4]
+    B_bytes = BUFFER.data[blkPtr + bytesPtr + 4:blkPtr + bytesPtr + 8]
+    bytesPtr += 8
+    return A_bytes, B_bytes, bytesPtr
+
+
 if __name__ =='__main__':
     generate_R_S()
     # sort_R()
