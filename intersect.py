@@ -81,7 +81,7 @@ def setIntersect():
         result_next_bytes_addr = IntToBytes(result_next_addr)
         for i in range(4):
             BUFFER.data[resultPtr + blkSize - 4 +i ] = result_next_bytes_addr[2*i:2*(i+1)]
-        BUFFER.writeBlockToDisk(resultPtr, './result/union/', result_addr)
+        BUFFER.writeBlockToDisk(resultPtr, './result/intersect/', result_addr)
         BUFFER.freeBlockInBuffer(resultPtr)
 
     print('The num of IO is', BUFFER.numIO)
