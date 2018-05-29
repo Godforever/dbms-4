@@ -27,6 +27,7 @@ def projection():
         BUFFER.freeBlockInBuffer(resultPtr)
 
     print('The num of IO is', BUFFER.numIO)
+    BUFFER.freeBuffer()
 
 
 if __name__ == '__main__':

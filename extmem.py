@@ -14,6 +14,9 @@ class TagBuffer():
 
     def freeBuffer(self):
         self.data = ['00' for i in range(self.bufSize)]
+        self.numAllBlk = self.bufSize // (self.blkSize + 1)
+        self.numFreeBlk = self.numAllBlk
+        self.numIO = 0
 
 
     def getNewBlockInBuffer(self):

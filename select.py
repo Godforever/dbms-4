@@ -44,6 +44,7 @@ def linear_search(R_A=40, S_C=60):
         BUFFER.freeBlockInBuffer(resultPtr)
 
     print('The num of IO is', BUFFER.numIO)
+    BUFFER.freeBuffer()
 
 
 # 二元搜索算法
@@ -63,8 +64,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                 blkPtr = high_Ptr
             bytesPtr = 0
             while bytesPtr < blkSize - 8:
-                A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
-                bytesPtr += 8
+                A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
                 if BytesToInt(A_bytes) == A_C:
                     print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')
                     resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
@@ -93,8 +93,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                         blkPtr = BUFFER.readBlockFromDisk(addr=blk_addr)
                         bytesPtr = 0
                         while bytesPtr < blkSize - 8:
-                            A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
-                            bytesPtr += 8
+                            A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
                             if BytesToInt(A_bytes) < A_C:
                                 flag = False
 
@@ -114,8 +113,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                         blkPtr = BUFFER.readBlockFromDisk(addr=blk_addr)
                         bytesPtr = 0
                         while bytesPtr < blkSize - 8:
-                            A_bytes, B_bytes = getBytes_A_B(blkPtr, bytesPtr)
-                            bytesPtr += 8
+                            A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
                             if BytesToInt(A_bytes) < A_C:
                                 flag = False
 
@@ -130,8 +128,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
 
                 bytesPtr = 0
                 while bytesPtr < blkSize - 8:
-                    A_bytes, B_bytes = getBytes_A_B(mid_Ptr, bytesPtr)
-                    bytesPtr += 8
+                    A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
                     if BytesToInt(A_bytes) == A_C:
                         print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')
                         resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
@@ -145,13 +142,13 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
 # 二元搜索 R_S，采用的二分查找的思想
 def binary_select_R_S(A=40, C=60):
 
-    # 对R进行搜索
+    sort_R()
+    sort_S()
+    # BUFFER.freeBuffer()
     result_addr = int(RESULT_BASE_ADDR, 16)
     resultPtr = BUFFER.getNewBlockInBuffer()
     result_offset = 0
-    sort_R()
     resultPtr, result_offset, result_addr = binary_select(R_BASE_ADDR, R_BLOCK_NUM, A, resultPtr, result_offset, result_addr)
-    sort_S()
     resultPtr, result_offset, result_addr = binary_select(S_BASE_ADDR, S_BLOCK_NUM, C, resultPtr, result_offset,
                                                           result_addr)
     # 将result的剩余部分写入磁盘中
@@ -160,10 +157,11 @@ def binary_select_R_S(A=40, C=60):
         result_next_bytes_addr = IntToBytes(result_next_addr)
         for i in range(4):
             BUFFER.data[resultPtr + blkSize - 8 + i] = result_next_bytes_addr[2 * i:2 * (i + 1)]
-        BUFFER.writeBlockToDisk(resultPtr, './result/linear_select/', result_addr)
+        BUFFER.writeBlockToDisk(resultPtr, './result/binary_select/', result_addr)
         BUFFER.freeBlockInBuffer(resultPtr)
 
     print('The num of IO is', BUFFER.numIO)
+    BUFFER.freeBuffer()
 
 
 
