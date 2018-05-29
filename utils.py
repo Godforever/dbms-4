@@ -36,7 +36,8 @@ def BytesToInt(b):
 def generate_R_S():
     R = [{'A':random.randint(1,40),'B':random.randint(1, 1000)} for i in range(R_TUPLE_NUM)]
     S = [{'C':random.randint(20,60),'D':random.randint(1, 1000)} for i in range(S_TUPLE_NUM)]
-
+    # R[0] = {'A':10,'B':100}
+    # S[0] = {'C':10,'D':100}
     addr = int(R_BASE_ADDR, 16)
     for i in range(R_TUPLE_NUM//7):
         with open('./disk_block/'+str(addr)+'.blk', 'w') as f:
@@ -93,7 +94,8 @@ def merge_sort(BASE_ADDR, BLOCK_NUM, blkSize):
         addr = int(''.join(BUFFER.data[blkPtr + 56: blkPtr + 60]), 16)
         BUFFER.freeBlockInBuffer(blkPtr)
 
-    value_list = sorted(value_list, key=lambda v:BytesToInt(v[0]))
+    # 先根据A进行排序，在根据B大小进行排序
+    value_list = sorted(value_list, key=lambda v: BytesToInt(v[0]) + 0.0001*BytesToInt(v[1]))
     addr = int(BASE_ADDR, 16)
     count = 0
     for k in range(BLOCK_NUM):

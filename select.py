@@ -18,7 +18,7 @@ def linear_search(R_A=40, S_C=60):
             if BytesToInt(''.join(A_bytes)) == R_A:
                 print('('+str(BytesToInt(''.join(A_bytes)))+',' +str(BytesToInt(''.join(B_bytes)))+')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
-                                                                   './result/linear_select', A_bytes + B_bytes)
+                                                                   './result/linear_select/', A_bytes + B_bytes)
         BUFFER.freeBlockInBuffer(blkPtr)
 
     S_addr = int(S_BASE_ADDR, 16)
@@ -31,7 +31,7 @@ def linear_search(R_A=40, S_C=60):
             if BytesToInt(''.join(C_bytes)) == S_C:
                 print('(' + str(BytesToInt(''.join(C_bytes))) + ',' + str(BytesToInt(''.join(D_bytes))) + ')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
-                                                                   './result/linear_select', C_bytes+ D_bytes)
+                                                                   './result/linear_select/', C_bytes+ D_bytes)
         BUFFER.freeBlockInBuffer(blkPtr)
 
     # 将result的剩余部分写入磁盘中
@@ -68,7 +68,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                 if BytesToInt(A_bytes) == A_C:
                     print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')
                     resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
-                                                                       './result/binary_select', A_bytes + B_bytes)
+                                                                       './result/binary_select/', A_bytes + B_bytes)
                 elif BytesToInt(A_bytes) > A_C:
                     BUFFER.freeBlockInBuffer(blkPtr)
                     break
@@ -102,7 +102,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                                     BytesToInt(''.join(B_bytes))) + ')')
                                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset,
                                                                                    result_addr,
-                                                                                   './result/binary_select',
+                                                                                   './result/binary_select/',
                                                                                    A_bytes + B_bytes)
                         blk_addr = blk_addr - 64
 
@@ -122,7 +122,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                                     BytesToInt(''.join(B_bytes))) + ')')
                                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset,
                                                                                    result_addr,
-                                                                                   './result/binary_select',
+                                                                                   './result/binary_select/',
                                                                                    A_bytes + B_bytes)
                         blk_addr = blk_addr + 64
 
@@ -132,7 +132,7 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
                     if BytesToInt(A_bytes) == A_C:
                         print('(' + str(BytesToInt(''.join(A_bytes))) + ',' + str(BytesToInt(''.join(B_bytes))) + ')')
                         resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
-                                                                           './result/binary_select', A_bytes + B_bytes)
+                                                                           './result/binary_select/', A_bytes + B_bytes)
                     elif BytesToInt(A_bytes) > A_C:
                         BUFFER.freeBlockInBuffer(mid_Ptr)
                         break
