@@ -3,7 +3,7 @@ from utils import *
 
 
 # 线性搜索算法
-def linear_search(R_A=40, S_C=60):
+def linear_select(R_A=40, S_C=60):
     BUFFER.freeBuffer()
     R_addr = int(R_BASE_ADDR, 16)
     resultPtr = BUFFER.getNewBlockInBuffer()
