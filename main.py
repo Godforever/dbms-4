@@ -18,7 +18,9 @@ def printTips():
     print('=                 8.Set Union.                               =')
     print('=                 9.Set Intersect.                           =')
     print('=                 10.Set Difference.                         =')
+    print('=                 11.Index Selecting.                        =')
     print('==============================================================')
+
 
 if __name__ == '__main__':
     while True:
@@ -44,5 +46,8 @@ if __name__ == '__main__':
             setIntersect()
         elif options == 10:
             setDifference()
+        elif options == 11:
+            index_select()
+
 
 

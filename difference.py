@@ -1,6 +1,5 @@
 from utils import *
 
-
 def setDifference():
     sort_R()
     sort_S()

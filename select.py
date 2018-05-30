@@ -1,10 +1,13 @@
-
 from utils import *
+
+
+
+R_INDEX_BASE_ADDR = '0x66666666'
+S_INDEX_BASE_ADDR = '0x77777777'
 
 
 # 线性搜索算法
 def linear_select(R_A=40, S_C=60):
-    BUFFER.freeBuffer()
     R_addr = int(R_BASE_ADDR, 16)
     resultPtr = BUFFER.getNewBlockInBuffer()
     result_offset = 0
@@ -15,8 +18,8 @@ def linear_select(R_A=40, S_C=60):
         bytesPtr = 0
         while bytesPtr < blkSize - 8:
             A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
-            if BytesToInt(''.join(A_bytes)) == R_A:
-                print('('+str(BytesToInt(''.join(A_bytes)))+',' +str(BytesToInt(''.join(B_bytes)))+')')
+            if BytesToInt(A_bytes) == R_A:
+                print('('+str(BytesToInt(A_bytes))+',' +str(BytesToInt(B_bytes))+')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
                                                                    './result/linear_select/', A_bytes + B_bytes)
         BUFFER.freeBlockInBuffer(blkPtr)
@@ -28,8 +31,8 @@ def linear_select(R_A=40, S_C=60):
         bytesPtr = 0
         while bytesPtr < blkSize - 8:
             C_bytes, D_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
-            if BytesToInt(''.join(C_bytes)) == S_C:
-                print('(' + str(BytesToInt(''.join(C_bytes))) + ',' + str(BytesToInt(''.join(D_bytes))) + ')')
+            if BytesToInt(C_bytes) == S_C:
+                print('(' + str(BytesToInt(C_bytes)) + ',' + str(BytesToInt(D_bytes)) + ')')
                 resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
                                                                    './result/linear_select/', C_bytes+ D_bytes)
         BUFFER.freeBlockInBuffer(blkPtr)
@@ -45,7 +48,6 @@ def linear_select(R_A=40, S_C=60):
 
     print('The num of IO is', BUFFER.numIO)
     BUFFER.freeBuffer()
-
 
 # 二元搜索算法
 def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_addr):
@@ -141,10 +143,9 @@ def binary_select(BASE_ADDR, BLOCK_NUM, A_C, resultPtr, result_offset, result_ad
 
 # 二元搜索 R_S，采用的二分查找的思想
 def binary_select_R_S(A=40, C=60):
-
     sort_R()
     sort_S()
-    # BUFFER.freeBuffer()
+    BUFFER.freeBuffer()
     result_addr = int(RESULT_BASE_ADDR, 16)
     resultPtr = BUFFER.getNewBlockInBuffer()
     result_offset = 0
@@ -163,9 +164,105 @@ def binary_select_R_S(A=40, C=60):
     print('The num of IO is', BUFFER.numIO)
     BUFFER.freeBuffer()
 
+# 建立索引
+def build_index(BASE_ADDR, BLOCK_NUM, INDEX_BASE_ADDR):
+    addr = int(BASE_ADDR, 16)
+    resultPtr = BUFFER.getNewBlockInBuffer()
+    result_offset = 0
+    result_addr = int(INDEX_BASE_ADDR, 16)
+    pr_A = 0
+    for i in range(BLOCK_NUM):
+        blkPtr = BUFFER.readBlockFromDisk(addr=addr)
+        bytesPtr = 0
+        while bytesPtr < blkSize - 8:
+            A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
+            if BytesToInt(A_bytes) > pr_A:
+                pr_A = BytesToInt(A_bytes)
+                addr_bytes = IntToBytes(addr)
+                addr_bytes = [addr_bytes[2*k:2*(k+1)] for k in range(4)]
+                resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
+                                                                   './index/', A_bytes+ addr_bytes)
+        addr = int(''.join(BUFFER.data[blkPtr + 56:blkPtr + 60]), 16)
+        BUFFER.freeBlockInBuffer(blkPtr)
+     # 将result的剩余部分写入磁盘中
+    if result_offset !=0:
+        result_next_addr = 0
+        result_next_bytes_addr = IntToBytes(result_next_addr)
+        for i in range(4):
+            BUFFER.data[resultPtr + blkSize - 8 +i ] = result_next_bytes_addr[2*i:2*(i+1)]
+        BUFFER.writeBlockToDisk(resultPtr, './index/', result_addr)
+        BUFFER.freeBlockInBuffer(resultPtr)
+    else:
+        BUFFER.writeBlockToDisk(resultPtr, './index/', result_addr)
+        BUFFER.freeBlockInBuffer(resultPtr)
+
+def index_origin(A, INDEX_BASE_ADDR, BASE_ADDR,resultPtr, result_offset, result_addr):
+    index_addr = int(INDEX_BASE_ADDR, 16)
+    block_addr = int(BASE_ADDR, 16)
+    index_bool = False
+    flag = True
+    while index_addr != 0 and flag:
+        blkPtr = BUFFER.readBlockFromDisk(path='./index/', addr=index_addr)
+        bytesPtr = 0
+        while bytesPtr < blkSize - 8:
+            A_bytes, R_addr, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
+            if BytesToInt(A_bytes) == A:
+                block_addr = BytesToInt(R_addr)
+                flag = False
+                index_bool = True
+                break
+            elif BytesToInt(A_bytes) > A:
+                flag = False
+                break
+        index_addr = int(''.join(BUFFER.data[blkPtr + 56:blkPtr + 60]), 16)
+        BUFFER.freeBlockInBuffer(blkPtr)
+    if not index_bool:
+        print('We can\'t find the index of R')
+    else:
+        while block_addr !=0:
+            blkPtr = BUFFER.readBlockFromDisk(addr=block_addr)
+            bytesPtr = 0
+            while bytesPtr < blkSize - 8:
+                A_bytes, B_bytes, bytesPtr = getBytes_A_B(blkPtr, bytesPtr)
+                if BytesToInt(A_bytes) == A:
+                    print('(' + str(BytesToInt(A_bytes)) + ',' + str(BytesToInt(B_bytes)) + ')')
+                    resultPtr, result_offset, result_addr = add_result(resultPtr, result_offset, result_addr,
+                                                                       './result/indesx_select/', A_bytes + B_bytes)
+            block_addr = int(''.join(BUFFER.data[blkPtr + 56:blkPtr + 60]), 16)
+            BUFFER.freeBlockInBuffer(blkPtr)
+
+    return resultPtr, result_offset, result_addr
+
+# 顺序索引搜索
+def index_select(A=40, C=40):
+    sort_R()
+    sort_S()
+    build_index(R_BASE_ADDR, R_BLOCK_NUM, R_INDEX_BASE_ADDR)
+    build_index(S_BASE_ADDR, S_BLOCK_NUM, S_INDEX_BASE_ADDR)
+    BUFFER.freeBuffer()
+    resultPtr = BUFFER.getNewBlockInBuffer()
+    result_offset = 0
+    result_addr = int(RESULT_BASE_ADDR, 16)
+    resultPtr, result_offset, result_addr = index_origin(A, R_INDEX_BASE_ADDR, R_BASE_ADDR,resultPtr, result_offset, result_addr)
+    resultPtr, result_offset, result_addr = index_origin(C, S_INDEX_BASE_ADDR, S_BASE_ADDR, resultPtr, result_offset, result_addr)
+    # 将result的剩余部分写入磁盘中
+    if result_offset !=0:
+        result_next_addr = 0
+        result_next_bytes_addr = IntToBytes(result_next_addr)
+        for i in range(4):
+            BUFFER.data[resultPtr + blkSize - 8 +i ] = result_next_bytes_addr[2*i:2*(i+1)]
+        BUFFER.writeBlockToDisk(resultPtr, './result/index_select/', result_addr)
+        BUFFER.freeBlockInBuffer(resultPtr)
+
+    print('The num of IO is', BUFFER.numIO)
+    BUFFER.freeBuffer()
+
+
 
 
 if __name__ == '__main__':
-    linear_search()
+    linear_select()
     binary_select_R_S()
+    index_select()
+
 

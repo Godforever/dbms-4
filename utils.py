@@ -3,11 +3,8 @@ import random
 
 # 设置关系R和关系S的地址范围
 R_BASE_ADDR = '0x11111111'
-R_MAX_ADDR = '0x22222222'
 S_BASE_ADDR = '0x33333333'
-S_MAX_ADDR = '0x44444444'
 RESULT_BASE_ADDR = '0x55555555'
-RESULT_MAX_ADDR = '0x66666666'
 blkSize = 64
 bufSize = 520
 
@@ -45,6 +42,8 @@ def generate_R_S():
                 f.write(IntToBytes(R[i*7+j]['A']))
                 f.write(IntToBytes(R[i * 7 + j]['B']))
             addr += 64
+            if i == R_TUPLE_NUM//7 - 1:
+                addr = 0
             f.write(IntToBytes(addr))
 
     addr = int(S_BASE_ADDR, 16)
@@ -54,6 +53,8 @@ def generate_R_S():
                 f.write(IntToBytes(S[i*7+j]['C']))
                 f.write(IntToBytes(S[i * 7 + j]['D']))
             addr += 64
+            if i == S_TUPLE_NUM // 7 - 1:
+                addr = 0
             f.write(IntToBytes(addr))
 
 def merge_sort(BASE_ADDR, BLOCK_NUM, blkSize):
@@ -105,6 +106,8 @@ def merge_sort(BASE_ADDR, BLOCK_NUM, blkSize):
             BUFFER.data[resultPtr + i * 8 + 4:resultPtr + i * 8 + 8] = value_list[count][1]
             count += 1
         nx_addr = IntToBytes(addr+64)
+        if k == BLOCK_NUM -1:
+            nx_addr = IntToBytes(0)
         BUFFER.data[resultPtr + 56:resultPtr + 60] = [nx_addr[:2],nx_addr[2:4],nx_addr[4:6],nx_addr[6:8]]
         BUFFER.writeBlockToDisk(resultPtr, './disk_block/', addr)
         addr += 64
